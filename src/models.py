@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, PrimaryKeyConstraint
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
@@ -13,37 +13,26 @@ class User(Base):
     username = Column(String(250), nullable=False, unique=True)
     email = Column(String(250), nullable=False, unique=True)
 
-    favorites = relationship("Favorites", back_populates="user")
-
 class Character(Base):
     __tablename__ = 'character'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
-    description = Column(String(500))
+    characteristics = Column(String(250))
     planet_id = Column(Integer, ForeignKey('planet.id'))
 
 class Planet(Base):
     __tablename__ = 'planet'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
-    description = Column(String(500))
+    characteristics = Column(String(250))
     galaxy = Column(String(250))
-
-    characters = relationship("Character", back_populates="planet")
 
 class Favorites(Base):
     __tablename__ = 'favorites'
-    name = Column(String(250), nullable=False)
+    id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    character_id = Column(Integer, ForeignKey('character.id', ondelete="SET NULL"), nullable=True)
-    planet_id = Column(Integer, ForeignKey('planet.id', ondelete="SET NULL"), nullable=True)
-
-    character = relationship("Character", back_populates="favorites")
-    planet = relationship("Planet", back_populates="favorites")
-
-    __table_args__ = (
-        PrimaryKeyConstraint('character_id', 'planet_id'),
-    )
+    character_id = Column(Integer, ForeignKey('character.id'), nullable=True)
+    planet_id = Column(Integer, ForeignKey('planet.id'), nullable=True)
 
 ## Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
